@@ -1,16 +1,30 @@
+import os
+
 from flask import Flask, request, jsonify
 from flask import render_template
 from models.recommend import get_recommendation
 import joblib
 import pandas as pd
-
+import os
+import joblib
 app = Flask(__name__)
 
-# =========================
-# LOAD TRAINED MODEL
-# =========================
-model = joblib.load("models/price_model.pkl")
+# Load or train model
+MODEL_PATH = "models/price_model.pkl"
 
+if os.path.exists(MODEL_PATH):
+    print("✅ Loading existing model...")
+    model = joblib.load(MODEL_PATH)
+else:
+    print("⚠️ Model not found. Training new model...")
+
+    from models.train_model import train_model
+    model = train_model()
+
+    # Save model for future use
+    os.makedirs("models", exist_ok=True)
+    joblib.dump(model, MODEL_PATH)
+    print("💾 Model saved!")
 # =========================
 # HOME ROUTE
 # =========================
