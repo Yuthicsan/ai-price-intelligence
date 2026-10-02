@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Price Predictor</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #38bdf8;
+        }
+
+        input {
+            padding: 10px;
+            margin: 8px;
+            width: 200px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #38bdf8;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 22px;
+            color: #22c55e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🤖 AI Tomato Price Predictor</h1>
+
+    <div>
+        <input type="number" id="year" placeholder="Year (2026)"><br>
+        <input type="number" id="month" placeholder="Month (1-12)"><br>
+        <input type="number" id="day" placeholder="Day (1-31)"><br>
+        <input type="number" id="prev_price" placeholder="Previous Price"><br>
+        <input type="number" id="price_change" placeholder="Price Change"><br>
+        <input type="number" id="rolling_avg_7" placeholder="7-Day Avg"><br>
+
+        <button onclick="predictPrice()">Predict Price</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        async function predictPrice() {
+
+            const data = {
+                year: Number(document.getElementById("year").value),
+                month: Number(document.getElementById("month").value),
+                day: Number(document.getElementById("day").value),
+                prev_price: Number(document.getElementById("prev_price").value),
+                price_change: Number(document.getElementById("price_change").value),
+                rolling_avg_7: Number(document.getElementById("rolling_avg_7").value)
+            };
+
+            const response = await fetch("/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            document.getElementById("result").innerHTML =
+                "💰 Predicted Price: ₹ " + result.predicted_price;
+        }
+    </script>
+
+</body>
+</html>
