@@ -1,15 +1,15 @@
 import os
-
-from flask import Flask, request, jsonify
-from flask import render_template
-from models.recommend import get_recommendation
 import joblib
 import pandas as pd
-import os
-import joblib
+from flask import Flask, request, jsonify, render_template
+from models.recommend import get_recommendation
+from chatbot import chatbot_response
+
 app = Flask(__name__)
 
-# Load or train model
+# =========================
+# LOAD OR TRAIN MODEL
+# =========================
 MODEL_PATH = "models/price_model.pkl"
 
 if os.path.exists(MODEL_PATH):
@@ -21,16 +21,14 @@ else:
     from models.train_model import train_model
     model = train_model()
 
-    # Save model for future use
     os.makedirs("models", exist_ok=True)
     joblib.dump(model, MODEL_PATH)
+
     print("💾 Model saved!")
+
 # =========================
-# HOME ROUTE
+# ROUTES
 # =========================
-# @app.route("/")
-# def home():
-#     return "✅ AI Price Prediction API is Running!"
 
 @app.route("/")
 def home():
@@ -45,9 +43,6 @@ def chat():
 
     return jsonify({"reply": response})
 
-# =========================
-# PREDICT ROUTE
-# =========================
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
     if request.method == "GET":
@@ -63,6 +58,7 @@ def predict():
         'price_change': [data["price_change"]],
         'rolling_avg_7': [data["rolling_avg_7"]]
     })
+
     prediction = model.predict(input_data)[0]
 
     recommendation = get_recommendation(
@@ -76,9 +72,7 @@ def predict():
     })
 
 # =========================
-# RUN SERVER
+# RUN
 # =========================
 if __name__ == "__main__":
     app.run(debug=True)
-
-
